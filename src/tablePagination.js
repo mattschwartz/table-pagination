@@ -232,7 +232,14 @@
                 var self = this;
 
                 $(rows).each(function (index, elem) {
-                    var rowText = $(elem).text().toLowerCase();
+                    var rowText = '';
+
+                    $(elem).find('td').each(function (_index, _elem) {
+                        if ($(_elem).attr(self._options.filter.ignore_columns_attr) == undefined
+                            && $.inArray(_index, self._options.filter.ignore_columns) == -1) {
+                            rowText += $(_elem).text().trim().toLowerCase();
+                        }
+                    });
 
                     if (rowText.indexOf(self._filterText) == -1) {
                         $(this).addClass('hidden');
@@ -291,6 +298,7 @@
             filter: {
                 elem: null,
                 refresh_delay: 0, // not yet implemented
+                ignore_columns_attr: null,
                 ignore_columns: []
             },
             ajax: { // not yet implemented
