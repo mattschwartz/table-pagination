@@ -2,14 +2,16 @@
     /*
      * Private Static variables
      */
-    var data = [],
-        TablePaginater = function () { },
-        getGuid = function () {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        };
+
+    /* Allows multiple tables per page to co-exist without affecting each other */
+    var data = [];
+    var TablePaginater = function () { };
+    var guid = function () {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
 
     TablePaginater.prototype = {
         _options: {},
@@ -76,7 +78,7 @@
                 }
 
                 html += 'pad-right-no">';
-                html += '<div class="col-xs-6"><label class="pull-right">Number of results per page:</label></div>';
+                html += '<div class="col-xs-6"><label class="pull-right">Results per page:</label></div>';
                 html += '<div class="col-xs-6 pad-right-no">';
                 html += '<select id="' + this._index + '_ResultsPerPage" class="chosen-select">';
 
@@ -112,7 +114,10 @@
                 });
             }
 
-            $(".chosen-select").chosen({ disable_search_threshold: 10 });
+            $('.chosen-select').chosen({
+                disable_search_threshold: 10,
+                width: '100%'
+            });
             $('.chosen').trigger('chosen:updated');
         },
 
@@ -285,7 +290,7 @@
         }
 
         var settings = $.extend({
-            visible_rows: 15,
+            visible_rows: 25,
             include_show_all: true,
             list_show_results: [15, 25, 50, 100],
             disable_pages_jump_threshhold: 5,
@@ -301,6 +306,7 @@
                 ignore_columns_attr: null,
                 ignore_columns: []
             },
+            sort: false, // not yet implemented
             ajax: { // not yet implemented
                 url: null,
                 totalRows: -1
@@ -329,7 +335,7 @@
         }
 
         tp = new TablePaginater();
-        tp._index = getGuid();
+        tp._index = guid();
         tp.init(settings, this);
         data[tp._index + '_table'] = tp;
 
