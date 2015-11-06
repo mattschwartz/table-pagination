@@ -291,35 +291,7 @@
             return;
         }
 
-        var settings = $.extend({
-            visible_rows: 25,
-            jump_nav: {
-                show_if_single_page: false,
-                disable_pages_jump_threshhold: 5,
-            },
-            results_per_page: {
-                include_show_all: true,
-                list_show_results: [15, 25, 50, 100],
-                above: true,
-                right: true,
-                pad_top: true,
-                pad_bottom: true,
-                attach_to_element: null
-            },
-            filter: {
-                elem: null,
-                refresh_delay: 0, // not yet implemented
-                ignore_columns_attr: null,
-                ignore_columns: []
-            },
-            sort: {
-                // not yet implemented
-            }, 
-            ajax: { // not yet implemented
-                url: null,
-                totalRows: -1
-            }
-        }, options);
+        var settings = setOrDefaultSettings(options);
 
         settings.results_per_page.list_show_results.sort(function (a, b) {
             return a - b;
@@ -395,5 +367,56 @@
                 tp.filter($(this).val() || $(this).text());
             });
         }
+    }
+
+    /* 
+     * Fill out default settings and override them with the user-specified
+     * settings if supplied.
+     */
+    function setOrDefaultSettings(options) {
+        var settings = $.extend({
+            visible_rows: 25,
+            jump_nav: {
+                show_if_single_page: false,
+                disable_pages_jump_threshhold: 5,
+            },
+            results_per_page: {
+                include_show_all: true,
+                list_show_results: [15, 25, 50, 100],
+                above: true,
+                right: true,
+                pad_top: true,
+                pad_bottom: true,
+                attach_to_element: null
+            },
+            filter: {
+                elem: null,
+                refresh_delay: 0, // not yet implemented
+                ignore_columns_attr: null,
+                ignore_columns: []
+            },
+            sort: {
+                // not yet implemented
+            },
+            ajax: { // not yet implemented
+                url: null,
+                totalRows: -1
+            }
+        }, options);
+
+        settings.jump_nav = {
+            disable_pages_jump_threshhold: options.jump_nav.disable_pages_jump_threshhold || 5
+        }
+
+        settings.results_per_page = {
+            include_show_all: options.results_per_page.include_show_all == undefined ? true : options.results_per_page.include_show_all,
+            list_show_results: options.results_per_page.list_show_results == undefined ? options.results_per_page.list_show_results : [15, 25, 50, 100],
+            above: options.results_per_page.above == undefined ? true : options.results_per_page.above,
+            right: options.results_per_page.right == undefined ? true : options.results_per_page.right,
+            pad_top: options.results_per_page.pad_top == undefined ? true : options.results_per_page.pad_top,
+            pad_bottom: options.results_per_page.pad_bottom == undefined ? true : options.results_per_page.pad_bottom,
+        }
+
+        return settings;
     }
 })(jQuery);
