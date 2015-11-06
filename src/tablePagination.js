@@ -293,13 +293,13 @@
 
         var settings = setOrDefaultSettings(options);
 
-        settings.results_per_page.list_show_results.sort(function (a, b) {
-            return a - b;
-        });
-
         if ($.inArray(settings.visible_rows, settings.results_per_page.list_show_results) == -1) {
             settings.results_per_page.list_show_results.push(settings.visible_rows);
         }
+
+        settings.results_per_page.list_show_results.sort(function (a, b) {
+            return a - b;
+        });
 
         if (settings.results_per_page.include_show_all) {
             settings.results_per_page.list_show_results.push('Show All');
