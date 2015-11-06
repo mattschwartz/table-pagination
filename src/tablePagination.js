@@ -63,17 +63,18 @@
             var self = this;
             var html = '';
             var select;
+            var attached = this._options.results_per_page.attach_to_element;
 
             var container = $('#' + this._index + '_ResultsPerPageContainer');
 
             if (!container || container.length == 0) {
                 html += '<div id="' + this._index + '_ResultsPerPageContainer" class="col-xs-12 col-sm-6 col-md-5 col-lg-4 pull-right ';
 
-                if (this._options.results_per_page.pad_top) {
+                if (!attached && this._options.results_per_page.pad_top) {
                     html += ' pad-top-md ';
                 }
 
-                if (this._options.results_per_page.pad_bottom) {
+                if (!attached && this._options.results_per_page.pad_bottom) {
                     html += ' pad-btm-md ';
                 }
 
@@ -82,7 +83,7 @@
                 html += '<div class="col-xs-6 pad-right-no">';
                 html += '<select id="' + this._index + '_ResultsPerPage" class="chosen-select">';
 
-                $.each(this._options.list_show_results, function (index, elem) {
+                $.each(this._options.results_per_page.list_show_results, function (index, elem) {
                     if (self._options.visible_rows == elem) {
                         html += '<option selected>' + elem + '</option>';
                     } else {
@@ -94,8 +95,10 @@
                 html += '</div>';
                 html += '</div>';
 
-                if (this._options.results_per_page.above) {
+                if (!attached && this._options.results_per_page.above) {
                     this.$_table.parent().prepend(html);
+                } else if (attached) {
+                    $(attached).append(html);
                 } else {
                     this.$_table.parent().append(html);
                 }
@@ -103,7 +106,7 @@
                 select = $('#' + this._index + '_ResultsPerPage');
                 select.empty();
 
-                $.each(this._options.list_show_results, function (index, elem) {
+                $.each(this._options.results_per_page.list_show_results, function (index, elem) {
                     if (self._options.visible_rows == elem) {
                         select.append('<option selected>' + elem + '</option>');
                     } else if (self._showAllResults && elem == 'Show All') {
@@ -136,7 +139,7 @@
                 html += '<div class="text-center">';
                 html += '<ul class="pagination pagination-sm tpage-nav" tpage-table-index="' + this._index + '">';
 
-                if (pages > this._options.disable_pages_jump_threshhold) {
+                if (pages > this._options.jump_nav.disable_pages_jump_threshhold) {
                     html += '<li jump-first tpage-index="1"><a href="javascript:void(0)">«</a></li>';
                 }
 
@@ -146,21 +149,20 @@
                     html += '<li tpage-index="' + i + '"><a href="javascript:void(0)">' + i + '</a></li>';
                 }
 
-
-                if (pages > this._options.disable_pages_jump_threshhold) {
+                if (pages > this._options.jump_nav.disable_pages_jump_threshhold) {
                     html += '<li jump-last tpage-index="' + pages + '"><a href="javascript:void(0)">»</a></li>';
                 }
 
                 html += '</ul>';
                 html += '</div></div>';
 
-                this.$_table.parent().append(html);
+                this.$_table.after(html);
             } else {
                 var ul = nav.find('ul');
                 ul.empty();
                 ul.removeClass('hidden');
 
-                if (pages > this._options.disable_pages_jump_threshhold) {
+                if (pages > this._options.jump_nav.disable_pages_jump_threshhold) {
                     ul.append('<li jump-first tpage-index="1"><a href="javascript:void(0)">«</a></li>');
                 }
 
@@ -170,12 +172,12 @@
                     ul.append('<li tpage-index="' + i + '"><a href="javascript:void(0)">' + i + '</a></li>');
                 }
 
-                if (pages > this._options.disable_pages_jump_threshhold) {
+                if (pages > this._options.jump_nav.disable_pages_jump_threshhold) {
                     ul.append('<li jump-last tpage-index="' + pages + '"><a href="javascript:void(0)">»</a></li>');
                 }
             }
 
-            if (pages <= 1) {
+            if (pages <= 1 && !this._options.jump_nav.show_if_single_page) {
                 $('#' + this._index + '_nav').find('ul').addClass('hidden');
             }
         },
@@ -291,14 +293,18 @@
 
         var settings = $.extend({
             visible_rows: 25,
-            include_show_all: true,
-            list_show_results: [15, 25, 50, 100],
-            disable_pages_jump_threshhold: 5,
+            jump_nav: {
+                show_if_single_page: false,
+                disable_pages_jump_threshhold: 5,
+            },
             results_per_page: {
+                include_show_all: true,
+                list_show_results: [15, 25, 50, 100],
                 above: true,
                 right: true,
                 pad_top: true,
-                pad_bottom: true
+                pad_bottom: true,
+                attach_to_element: null
             },
             filter: {
                 elem: null,
@@ -306,23 +312,25 @@
                 ignore_columns_attr: null,
                 ignore_columns: []
             },
-            sort: false, // not yet implemented
+            sort: {
+                // not yet implemented
+            }, 
             ajax: { // not yet implemented
                 url: null,
                 totalRows: -1
             }
         }, options);
 
-        settings.list_show_results.sort(function (a, b) {
+        settings.results_per_page.list_show_results.sort(function (a, b) {
             return a - b;
         });
 
-        if ($.inArray(settings.visible_rows, settings.list_show_results) == -1) {
-            settings.list_show_results.push(settings.visible_rows);
+        if ($.inArray(settings.visible_rows, settings.results_per_page.list_show_results) == -1) {
+            settings.results_per_page.list_show_results.push(settings.visible_rows);
         }
 
-        if (settings.include_show_all) {
-            settings.list_show_results.push('Show All');
+        if (settings.results_per_page.include_show_all) {
+            settings.results_per_page.list_show_results.push('Show All');
         }
 
         var tp;
