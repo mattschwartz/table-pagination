@@ -68,20 +68,11 @@
             var container = $('#' + this._index + '_ResultsPerPageContainer');
 
             if (!container || container.length == 0) {
-                html += '<div id="' + this._index + '_ResultsPerPageContainer" class="col-xs-12 col-sm-6 col-md-5 col-lg-4 pull-right ';
+                html += '<div id="' + this._index + '_ResultsPerPageContainer"';
 
-                if (!attached && this._options.results_per_page.pad_top) {
-                    html += ' pad-top-md ';
-                }
-
-                if (!attached && this._options.results_per_page.pad_bottom) {
-                    html += ' pad-btm-md ';
-                }
-
-                html += 'pad-right-no">';
-                html += '<div class="col-xs-6"><label class="pull-right">Results per page:</label></div>';
-                html += '<div class="col-xs-6 pad-right-no">';
-                html += '<select id="' + this._index + '_ResultsPerPage" class="chosen-select">';
+                html += '<div><label>Results per page:</label></div>';
+                html += '<div>';
+                html += '<select id="' + this._index + '_ResultsPerPage" class="chosen">';
 
                 $.each(this._options.results_per_page.list_show_results, function (index, elem) {
                     if (self._options.visible_rows == elem) {
@@ -95,10 +86,10 @@
                 html += '</div>';
                 html += '</div>';
 
-                if (!attached && this._options.results_per_page.above) {
-                    this.$_table.parent().prepend(html);
-                } else if (attached) {
+                if (attached) {
                     $(attached).append(html);
+                } else if (this._options.results_per_page.above) {
+                    this.$_table.parent().prepend(html);
                 } else {
                     this.$_table.parent().append(html);
                 }
@@ -117,7 +108,7 @@
                 });
             }
 
-            $('.chosen-select').chosen({
+            $('#' + this._index + '_ResultsPerPage').chosen({
                 disable_search_threshold: 10,
                 width: '100%'
             });
@@ -293,13 +284,13 @@
 
         var settings = setOrDefaultSettings(options);
 
-        if ($.inArray(settings.visible_rows, settings.results_per_page.list_show_results) == -1) {
-            settings.results_per_page.list_show_results.push(settings.visible_rows);
-        }
-
         settings.results_per_page.list_show_results.sort(function (a, b) {
             return a - b;
         });
+
+        if ($.inArray(settings.visible_rows, settings.results_per_page.list_show_results) == -1) {
+            settings.results_per_page.list_show_results.push(settings.visible_rows);
+        }
 
         if (settings.results_per_page.include_show_all) {
             settings.results_per_page.list_show_results.push('Show All');
@@ -409,6 +400,7 @@
         }
 
         settings.results_per_page = {
+            attach_to_element: settings.results_per_page.attach_to_element == undefined ? null : settings.results_per_page.attach_to_element,
             include_show_all: settings.results_per_page.include_show_all == undefined ? true : settings.results_per_page.include_show_all,
             list_show_results: settings.results_per_page.list_show_results == undefined ? [15, 25, 50, 100] : settings.results_per_page.list_show_results,
             above: settings.results_per_page.above == undefined ? true : settings.results_per_page.above,
