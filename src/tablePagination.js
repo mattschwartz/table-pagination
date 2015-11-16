@@ -19,12 +19,18 @@
         $_table: null,
         _filteredRows: null,
         _showAllResults: false,
+        _index: null,
 
         init: function (options, elem) {
             this._table = elem;
             this.$_table = $(elem);
             this._options = options;
 
+            this.$_table.attr('tpage-table-id', this._index);
+            this.update();
+        },
+
+        update: function () {
             this.paginateTable();
             this.addResultsPerPage();
             this.addPageNavBar();
@@ -35,7 +41,11 @@
          * on a page.
          */
         paginateTable: function () {
-            var rows = this.$_table.find('tbody tr');
+            this.$_table.find('.tpage-hide').each(function () {
+                $(this).addClass('hidden');
+            });
+
+            var rows = this.$_table.find('tbody tr').not('.tpage-hide');
             var totalRows = rows.length;
 
             if (this._options.visible_rows == -1) {
@@ -119,7 +129,7 @@
          * Adds the nav bar html to the table
          */
         addPageNavBar: function () {
-            var totalRows = (this._filteredRows || $(this._table).find('tbody tr')).length;
+            var totalRows = (this._filteredRows || $(this._table).find('tbody tr').not('.tpage-hide')).length;
 
             var pages = Math.ceil(totalRows / this._options.visible_rows);
             var html = '';
@@ -185,7 +195,7 @@
             if (this._filteredRows && this._filteredRows.length > 0) {
                 rows = this._filteredRows;
             } else {
-                rows = $(this._table).find('tbody tr');
+                rows = $(this._table).find('tbody tr').not('.tpage-hide');
             }
 
             numRows = rows.length;
@@ -212,7 +222,7 @@
          * that match the filter.
          */
         filter: function (text) {
-            var rows = this.$_table.find('tbody tr');
+            var rows = this.$_table.find('tbody tr').not('.tpage-hide');
             var totalRows = 0;
             var self = this;
             var isFilterNull = false;
@@ -273,6 +283,22 @@
         }
     }
 
+    $.fn.update = function () {
+        if (!this.length) {
+            return;
+        }
+
+        var key = $(this).attr('tpage-table-id');
+
+        if (data[key]) {
+            tp = data[key];
+            tp.update();
+            return tp._index;
+        }
+
+        return '';
+    }
+
     /* 
      * Public jQuery plugin method.
      * usage: $('selector').tpage(options);
@@ -308,7 +334,7 @@
         tp = new TablePaginater();
         tp._index = guid();
         tp.init(settings, this);
-        data[tp._index + '_table'] = tp;
+        data[tp._index] = tp;
 
         var self = this;
 
@@ -321,7 +347,7 @@
             var li = $(nav).find('li');
             var index = $(this).attr('tpage-index');
             var pages = li.length - 2;
-            var table = $('[tpage-table-id="' + tp._index + '_table"]');
+            var table = $('[tpage-table-id="' + tp._index + '"]');
 
             li.each(function (index, elem) {
                 $(this).removeClass('disabled');
