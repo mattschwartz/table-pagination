@@ -74,14 +74,16 @@
             var html = '';
             var select;
             var attached = this._options.results_per_page.attach_to_element;
+            var labelClass = this._options.results_per_page.label_class || 'col-xs-4';
+            var selectClass = this._options.results_per_page.select_class || 'col-xs-8';
 
             var container = $('#' + this._index + '_ResultsPerPageContainer');
 
             if (!container || container.length == 0) {
-                html += '<div id="' + this._index + '_ResultsPerPageContainer"';
+                html += '<div id="' + this._index + '_ResultsPerPageContainer">';
 
-                html += '<div><label>Results per page:</label></div>';
-                html += '<div>';
+                html += '<div class="' + labelClass + '"><label>Results per page:</label></div>';
+                html += '<div class="' + selectClass + '" style="padding-right: 0">';
                 html += '<select id="' + this._index + '_ResultsPerPage" class="chosen">';
 
                 $.each(this._options.results_per_page.list_show_results, function (index, elem) {
@@ -98,8 +100,6 @@
 
                 if (attached) {
                     $(attached).append(html);
-                } else if (this._options.results_per_page.above) {
-                    this.$_table.parent().prepend(html);
                 } else {
                     this.$_table.parent().append(html);
                 }
@@ -122,7 +122,7 @@
                 disable_search_threshold: 10,
                 width: '100%'
             });
-            $('.chosen').trigger('chosen:updated');
+            $('#' + this._index + '_ResultsPerPage').trigger('chosen:updated');
         },
 
         /*
@@ -400,10 +400,8 @@
             results_per_page: {
                 include_show_all: true,
                 list_show_results: [15, 25, 50, 100],
-                above: true,
-                right: true,
-                pad_top: true,
-                pad_bottom: true,
+                label_class: null,
+                select_class: null,
                 attach_to_element: null
             },
             filter: {
@@ -428,11 +426,8 @@
         settings.results_per_page = {
             attach_to_element: settings.results_per_page.attach_to_element == undefined ? null : settings.results_per_page.attach_to_element,
             include_show_all: settings.results_per_page.include_show_all == undefined ? true : settings.results_per_page.include_show_all,
+            text_position: settings.results_per_page.text_position == undefined ? 'top' : settings.results_per_page.text_position,
             list_show_results: settings.results_per_page.list_show_results == undefined ? [15, 25, 50, 100] : settings.results_per_page.list_show_results,
-            above: settings.results_per_page.above == undefined ? true : settings.results_per_page.above,
-            right: settings.results_per_page.right == undefined ? true : settings.results_per_page.right,
-            pad_top: settings.results_per_page.pad_top == undefined ? true : settings.results_per_page.pad_top,
-            pad_bottom: settings.results_per_page.pad_bottom == undefined ? true : settings.results_per_page.pad_bottom,
         }
 
         return settings;
